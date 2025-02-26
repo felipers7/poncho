@@ -1,0 +1,8 @@
+<mat-form-field appearance="outline" class="full-width">
+    <mat-label>Select Option</mat-label>
+    <mat-select formControlName="%v%">
+      <mat-option *ngFor="let option of %v%" [value]="option">
+        {{ option.descripcion%V% }}
+      </mat-option>
+    </mat-select>
+</mat-form-field>

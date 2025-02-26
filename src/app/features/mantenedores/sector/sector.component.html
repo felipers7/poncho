@@ -1,0 +1,35 @@
+<app-head-table></app-head-table>
+<br>
+<div class="container mx-auto p-4 bg-white">
+    <!-- Header Section -->
+    <div class="bg-white p-4 rounded-lg  flex justify-between items-center mb-4">
+        <div class="flex items-center space-x-2">
+            <!-- Botón regresar -->
+            <button class="elitsoft-btn" (click)="volver()">
+                <mat-icon>arrow_back</mat-icon> Volver
+            </button>
+            <!-- Titulo -->
+            <h1 class="text-xl ">{{ titulo }}</h1>
+        </div>
+        <div class="flex space-x-2">
+            <!-- Botones y Acciones -->
+            <app-opciones-mantenedor [hasSelection]="hasSelection" [selectedData]="selectedData"
+                (agregar)="agregarServicio()" (exportar)="exportarExcel($event)" (eliminar)="eliminarServicio($event)">
+            </app-opciones-mantenedor>
+
+
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="bg-white p-4 rounded-lg ">
+        <app-shared-table [displayedColumns]="displayedColumns" [dataSource]="dataSource" [pageNumber]="pageNumber"
+            [totalElements]="totalElements" [totalPages]="totalPages" [pageSize]="pageSize"
+            (deleteSelected)="onDeleteSelected($event)" (viewSelected)="onViewSelected($event)"
+            (pageChanged)="onPageChanged($event)" (sort)="sortDatos($event)" (editSelected)="onEditSelected($event)"
+            (selectionChange)="onSelectionChange($event)"></app-shared-table>
+    </div>
+
+
+
+</div>

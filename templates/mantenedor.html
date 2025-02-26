@@ -1,0 +1,4 @@
+
+
+<app-shared-table [dataSource]="order" [columns]="columns" [pageSizeOptions]="[5, 10, 20]" [rowActions]="rowActions"
+(rowSelected)="onRowSelected($event)" (actionClicked)="onActionClicked($event)">

@@ -1,0 +1,21 @@
+<app-titulo-dialogo title="Agregar Sector" icon="task" [ref]="dialogRef"></app-titulo-dialogo>
+
+<mat-dialog-content class="!p-0">
+	<form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+		<mat-form-field appearance="outline" class="w-full">
+			<mat-label>Descripción Sector</mat-label>
+			<input matInput formControlName="%e%Desc" placeholder="Ingrese la descripción" class="w-full">
+			<mat-error *ngIf="form.get('%e%Desc')?.hasError('required')" class="text-red-500">
+				Este campo es requerido
+			</mat-error>
+		</mat-form-field>
+		<div class="grid grid-cols-2 gap-4 w-full">
+			<button type="button" (click)="dialogRef.close()" class="elitsoft-warn w-full flex items-center justify-center py-2 text-center">
+				Cancelar
+			</button>
+			<button type="submit" [disabled]="form.invalid" class="elitsoft-btn w-full flex items-center justify-center py-2 text-center disabled:opacity-50">
+				{{ esActualizar() ? 'Actualizar' : 'Guardar' }}
+			</button>
+		</div>
+	</form>
+</mat-dialog-content>
