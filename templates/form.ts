@@ -6,8 +6,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { %E%Service } from '../../../core/services/%k%.service';
 import { MatError, MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
-/*servicesImports*/
+/*services-imports*/
+
 
 import {
   MAT_DIALOG_DATA,
@@ -17,12 +20,14 @@ import {
   MatDialogContent,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TituloDialogoComponent } from "../titulo-dialogo/titulo-dialogo.component";
 import { %E% } from '../../../core/models/%k%.model';
+import { catchError, tap, throwError } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-%e%-create-form',
+  selector: 'app-%k%-create-form',
   standalone: true,
   imports: [
     CommonModule,
@@ -31,6 +36,8 @@ import { %E% } from '../../../core/models/%k%.model';
     MatButtonModule,
     MatFormFieldModule,
     MatDialogContent,
+    MatSelectModule,
+    MatOptionModule,
     MatDialogActions,
     MatDialogClose,
     MatError,
@@ -47,37 +54,40 @@ export class %E%FormComponent implements OnInit {
   readonly data = inject<any>(MAT_DIALOG_DATA);
   readonly esActualizar = model(this.data.esActualizar);
 
-  //declarations
+  /*variable-declarations*/
+
 
   constructor(
     private fb: FormBuilder,
     private %e%Service: %E%Service,
-    //other services
+    private translate: TranslateService,
+    private toastr: ToastrService,
+    /*other-services-injection*/
   ) {
     // Tipando el FormGroup
     this.form = this.fb.group({
-     /*inputsflag*/
+      /*inputsflag*/
     });
   }
 
   ngOnInit() {
     console.log("Datos recibidos en el formulario:", this.data);
 
-    // Verificar si 'data.object' existe y tiene el campo '%e%Desc'
+    // Verificar si 'data.object' existe y tiene el campo 'descripcion%E%'
     if (this.esActualizar() && this.data?.object) {
       console.log("Objeto recibido:", this.data.object);
 
 
       this.form.patchValue({
-       /*objectFields*/
+        /*object-fields-edit*/
       });
 
       console.log("Datos en el formulario después de patchValue:", this.form.value);
     } else {
       console.error("No se recibió un objeto válido en 'data'");
     }
+    /*services-init-call*/
 
-    /*service*/
   }
 
   onSubmit() {
@@ -85,13 +95,37 @@ export class %E%FormComponent implements OnInit {
 
     if (this.form.valid) {
       const formData: %E% = {
-       /*formFields*/
+        /*form-fields-submit*/
       };
 
       console.log("Datos mapeados para enviar:", formData);
 
       // Cierra el formulario con los datos correctos
-      this.dialogRef.close(formData);
+      if (this.esActualizar()) {
+        this.%e%Service.actualizar(formData.id, formData).subscribe({
+          next: (response) => {
+            this.toastr.success(this.translate.instant('mantenedores.formularios.toastr.success'));
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            const errorMessage = error.error?.message || this.translate.instant('mantenedores.formularios.toastr.error');
+            this.toastr.error(errorMessage);
+          }
+        })
+
+      }
+      else {
+        this.%e%Service.crear(formData).subscribe({
+          next: (response) => {
+            this.toastr.success(this.translate.instant('mantenedores.formularios.toastr.success'));
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            const errorMessage = error.error?.message || this.translate.instant('mantenedores.formularios.toastr.error');
+            this.toastr.error(errorMessage);
+          }
+        })
+      }
     } else {
       console.log("Formulario no válido");
     }

@@ -48,14 +48,10 @@ func generateFormFile(interfaceName string) error {
 	interfaceName = toPascalCase(interfaceName)
 	// Build the path to the model file (always inside app/models)
 
-	modelPath := filepath.Join("src", "app", "core", "models", fmt.Sprintf("%s.model.ts", toKebabCase(interfaceName)))
-	modelPath = filepath.Join(".", modelPath)
-
-	modelData, err := os.ReadFile(modelPath)
+	modelContent, err := openModelAsString(interfaceName)
 	if err != nil {
-		return fmt.Errorf("failed to read model file: %w", err)
+		return fmt.Errorf("failed to open model file: %w", err)
 	}
-	modelContent := string(modelData)
 
 	fmt.Println("after " + interfaceName)
 	// Locate the interface block. We look for "export interface <interfaceName>"
@@ -118,6 +114,19 @@ func generateFormFile(interfaceName string) error {
 		}
 
 		if defaultVal == "{}" {
+			//fmt.Printf("modelContent %s\n", modelContent)
+			//fmt.Printf("propName %s\n", propName)
+			typeOfVariable := extractFieldType(modelContent, toKebabCase(propName))
+			//fmt.Printf("typeOfVariable %s\n", typeOfVariable)
+			variableContent, err := openModelAsString(typeOfVariable)
+			//fmt.Printf("variableContent %s\n", variableContent)
+			if err != nil {
+				return fmt.Errorf("failed to open model file: %w", err)
+			}
+
+			nameOfVariableDesc := extractDescriptionFieldName(variableContent)
+			fmt.Printf("nameOfVariableDesc %s", nameOfVariableDesc)
+
 			selectValues = append(selectValues, propName+": "+toPascalCase(propName)+"[] = [];")
 			selectServices = append(selectServices, fmt.Sprintf(
 				"private %sService: %sService,",
@@ -153,38 +162,51 @@ func generateFormFile(interfaceName string) error {
 			formInputs = append(formInputs, fmt.Sprintf(
 				`
 				<mat-form-field appearance="outline" class="full-width">
-					<mat-label>%s</mat-label>
+					<mat-label>{{ 'mantenedores.formularios.%s.label.%s' | translate }}</mat-label>
 					<mat-select formControlName="%s">
 					<mat-option *ngFor="let option of %s" [value]="option">
-						{{ option.descripcion%s }}
+						{{ option.%s }}
 					</mat-option>
 					</mat-select>
 				</mat-form-field>
 				`,
-				toPascalCase(propName),
+				interfaceName,
 				propName,
 				propName,
-				toPascalCase(propName),
+				propName,
+				nameOfVariableDesc,
 			))
 		} else {
-			formInputs = append(formInputs, fmt.Sprintf(
-				`
-				<mat-form-field appearance="outline" class="full-width">
-				<mat-label>%s</mat-label>
-				<input matInput formControlName="%s" placeholder="%s">
-				<mat-error *ngIf="form.get('%s')?.invalid">{ "required" | translate }</mat-error>
-				</mat-form-field>
-				`,
-				propName,
-				propName,
-				propName,
-				propName,
-			))
+			if propName != "id" {
+				formInputs = append(formInputs, fmt.Sprintf(
+					`
+					   <mat-form-field appearance="outline" class="w-full dark:text-white  ">
+							<mat-label>{{ 'mantenedores.formularios.%s.label.%s' | translate }}</mat-label>
+							<input matInput formControlName="%s"
+								[attr.placeholder]="'mantenedores.formularios.%s.descripcion' | translate"
+								class="w-full dark:text-white ">
+							<mat-error *ngIf="form.get('%s')?.hasError('required')" class="text-red-500">
+								{{ 'mantenedores.formularios.campoRequerido' | translate }}
+							</mat-error>
+						</mat-form-field>
+					`,
+					interfaceName,
+					propName,
+					propName,
+					propName,
+					propName,
+				))
+			}
 		}
 
 		// Create a line for the form group.
 		// (Assuming the property name is already in camelCase.)
-		inputLine := fmt.Sprintf("  %s: [%s, Validators.required],", propName, defaultVal)
+		var inputLine string
+		if propName == "id" {
+			inputLine = fmt.Sprintf("  %s: [%s,],", propName, defaultVal)
+		} else {
+			inputLine = fmt.Sprintf("  %s: [%s, Validators.required],", propName, defaultVal)
+		}
 		inputsLines = append(inputsLines, inputLine)
 
 		objectField := fmt.Sprintf("%s: this.data.object.%s,", propName, propName)
@@ -200,10 +222,8 @@ func generateFormFile(interfaceName string) error {
 	selectServicesBlock := strings.Join(selectServices, "\n")
 	servicesImportBlock := strings.Join(servicesImport, "\n")
 	servicesImplementationBlock := strings.Join(implementationServices, "\n")
-
 	objectFieldsBlock := strings.Join(objectFields, "\n")
 	formFieldsBlock := strings.Join(formValues, "\n")
-
 	formBlocks := strings.Join(formInputs, "\n")
 
 	// Read the template file from templates/forms.ts.
@@ -221,25 +241,19 @@ func generateFormFile(interfaceName string) error {
 	}
 	templateHTMLContent := string(templateHTMLData)
 
-	// Replace %E% and %e% with the proper name variants.
-	templateContent = strings.ReplaceAll(templateContent, "%E%", toPascalCase(interfaceName))
-	templateContent = strings.ReplaceAll(templateContent, "%em%", toLowerCamelCase(interfaceName))
-	templateContent = strings.ReplaceAll(templateContent, "%e%", toLowerCamelCase(interfaceName))
-	templateContent = strings.ReplaceAll(templateContent, "%s%", sentenceFromKebab(interfaceName))
+	templateContent = standardReplacement(templateContent, interfaceName)
 
-	templateContent = strings.ReplaceAll(templateContent, "%k%", toKebabCase(interfaceName))
 	// Replace the marker /*inputsflag*/ with the generated inputs block.
-	templateContent = strings.Replace(templateContent, "/*inputsflag*/", inputsBlock, 1)
-	templateContent = strings.Replace(templateContent, "//declarations", selectValuesBlock, 1)
-	templateContent = strings.Replace(templateContent, "//other services", selectServicesBlock, 1)
-	templateContent = strings.Replace(templateContent, "/*servicesImports*/", servicesImportBlock, 1)
-	templateContent = strings.Replace(templateContent, "/*service*/", servicesImplementationBlock, 1)
-	templateContent = strings.Replace(templateContent, "/*objectFields*/", objectFieldsBlock, 1)
-	templateContent = strings.Replace(templateContent, "/*formFields*/", formFieldsBlock, 1)
+	templateContent = insertAfterMarker(templateContent, "/*inputsflag*/", inputsBlock)
+	templateContent = insertAfterMarker(templateContent, "/*variable-declarations*/", selectValuesBlock)
+	templateContent = insertAfterMarker(templateContent, "/*other-services-injection*/", selectServicesBlock)
+	templateContent = insertAfterMarker(templateContent, "/*services-imports*/", servicesImportBlock)
+	templateContent = insertAfterMarker(templateContent, "/*services-init-call*/", servicesImplementationBlock)
+	templateContent = insertAfterMarker(templateContent, "/*object-fields-edit*/", objectFieldsBlock)
+	templateContent = insertAfterMarker(templateContent, "/*form-fields-submit*/", formFieldsBlock)
 
-	templateHTMLContent = strings.Replace(templateHTMLContent, "<!--Input -->", formBlocks, 1)
-
-	templateHTMLContent = strings.ReplaceAll(templateHTMLContent, "%s%", sentenceFromKebab(interfaceName))
+	templateHTMLContent = insertAfterMarker(templateHTMLContent, "<!--Input -->", formBlocks)
+	templateHTMLContent = standardReplacement(templateHTMLContent, interfaceName)
 
 	// Build the output file name using kebab-case.
 
@@ -248,7 +262,7 @@ func generateFormFile(interfaceName string) error {
 	outputPath := filepath.Join("src", "app", "shared", "components", "forms", outputFileName)
 	outputPathHTML := filepath.Join("src", "app", "shared", "components", "forms", outputFileHTMLName)
 
-	outputDir := "." + "/src/app/shared/components/forms"
+	outputDir := "./src/app/shared/components/forms"
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		fmt.Printf("Error creating directories: %v\n", err)
 		os.Exit(1)

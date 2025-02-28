@@ -1,21 +1,30 @@
-<app-titulo-dialogo title="Agregar Sector" icon="task" [ref]="dialogRef"></app-titulo-dialogo>
+<app-titulo-dialogo
+    [title]="(esActualizar() ? 'mantenedores.formularios.sector.tituloEditar' : 'mantenedores.formularios.sector.tituloAgregar') | translate"
+    icon="task" [ref]="dialogRef">
+</app-titulo-dialogo>
 
-<mat-dialog-content class="!p-0">
-	<form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
-		<mat-form-field appearance="outline" class="w-full">
-			<mat-label>Descripción Sector</mat-label>
-			<input matInput formControlName="%e%Desc" placeholder="Ingrese la descripción" class="w-full">
-			<mat-error *ngIf="form.get('%e%Desc')?.hasError('required')" class="text-red-500">
-				Este campo es requerido
-			</mat-error>
-		</mat-form-field>
-		<div class="grid grid-cols-2 gap-4 w-full">
-			<button type="button" (click)="dialogRef.close()" class="elitsoft-warn w-full flex items-center justify-center py-2 text-center">
-				Cancelar
-			</button>
-			<button type="submit" [disabled]="form.invalid" class="elitsoft-btn w-full flex items-center justify-center py-2 text-center disabled:opacity-50">
-				{{ esActualizar() ? 'Actualizar' : 'Guardar' }}
-			</button>
-		</div>
-	</form>
+<mat-dialog-content class="!p-0 dark:bg-neutral-800">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+        <mat-form-field appearance="outline" class="w-full dark:text-white  ">
+            <mat-label>{{ 'mantenedores.formularios.sector.label' | translate }}</mat-label>
+            <input matInput formControlName="descripcionsector"
+                [attr.placeholder]="'mantenedores.formularios.sector.descripcion' | translate"
+                class="w-full dark:text-white ">
+            <mat-error *ngIf="form.get('descripcionsector')?.hasError('required')" class="text-red-500">
+                {{ 'mantenedores.formularios.sector.campoRequerido' | translate }}
+            </mat-error>
+        </mat-form-field>
+        <div class="grid grid-cols-2 gap-4 w-full">
+            <button type="button" (click)="dialogRef.close()"
+                class="elitsoft-warn w-full flex items-center justify-center py-2 text-center">
+                {{ 'mantenedores.formularios.sector.botonCancelar' | translate }}
+            </button>
+            <button type="submit" [disabled]="form.invalid"
+                class="elitsoft-btn w-full flex items-center justify-center py-2 text-center disabled:opacity-50">
+                {{ (esActualizar() ? 'mantenedores.formularios.sector.actualizar' :
+                'mantenedores.formularios.sector.guardar') |
+                translate }}
+            </button>
+        </div>
+    </form>
 </mat-dialog-content>

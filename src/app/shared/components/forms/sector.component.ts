@@ -7,9 +7,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SectorService } from '../../../core/services/sector.service';
 import { MatError, MatFormFieldModule } from '@angular/material/form-field';
 
-import { ZonaService } from '../../core/services/zona.service';
-				import { Zona } from '../../models/zona.model'; 
-				
+
 
 import {
   MAT_DIALOG_DATA,
@@ -49,33 +47,31 @@ export class SectorFormComponent implements OnInit {
   readonly data = inject<any>(MAT_DIALOG_DATA);
   readonly esActualizar = model(this.data.esActualizar);
 
-  zona: Zona[] = [];
+
 
   constructor(
     private fb: FormBuilder,
     private sectorService: SectorService,
-    private zonaService: ZonaService,
+
   ) {
     // Tipando el FormGroup
     this.form = this.fb.group({
-       id: [null, Validators.required],
-  descripcionSector: [null, Validators.required],
-  zona: [{}, Validators.required],
+      id: [null],
+      descripcionsector: [null, Validators.required],
     });
   }
 
   ngOnInit() {
     console.log("Datos recibidos en el formulario:", this.data);
 
-    // Verificar si 'data.object' existe y tiene el campo 'sectorDesc'
+    // Verificar si 'data.object' existe y tiene el campo 'descripcionsector'
     if (this.esActualizar() && this.data?.object) {
       console.log("Objeto recibido:", this.data.object);
 
 
       this.form.patchValue({
-       id: this.data.object.id
-descripcionSector: this.data.object.descripcionSector
-zona: this.data.object.zona
+        id: this.data.object.id,
+        descripcionsector: this.data.object.descripcionsector,
       });
 
       console.log("Datos en el formulario después de patchValue:", this.form.value);
@@ -83,14 +79,7 @@ zona: this.data.object.zona
       console.error("No se recibió un objeto válido en 'data'");
     }
 
-    
-					this.zonaService.buscarTodos().subscribe({
-						next:(zona :Zona[])=>{
-							console.log("created entity ", zona)
-							this.zona = zona
-						}
-					})
-				
+
   }
 
   onSubmit() {
@@ -98,9 +87,8 @@ zona: this.data.object.zona
 
     if (this.form.valid) {
       const formData: Sector = {
-       id: this.form.value.id
-descripcionSector: this.form.value.descripcionSector
-zona: this.form.value.zona
+        id: this.form.value.id,
+        descripcionsector: this.form.value.descripcionsector,
       };
 
       console.log("Datos mapeados para enviar:", formData);

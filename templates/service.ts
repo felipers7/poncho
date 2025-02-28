@@ -21,7 +21,7 @@ export class %E%Service {
     }
 
     buscarTodos(): Observable<%E%[]> {
-        return this.http.get<%E%[]>(`${this.url}%ee%`, { headers: this.headers });
+        return this.http.get<%E%[]>(`${this.url}%ee%/lote`, { headers: this.headers });
     }
 
     borrar(%e%Id: number): Observable<any> {
@@ -29,7 +29,7 @@ export class %E%Service {
     }
 
     borrarTodos(ids: number[]): Observable<any> {
-        return this.http.delete<any>(`${this.url}%ee%/`, { headers: this.headers, body: ids });
+        return this.http.delete<any>(`${this.url}%ee%/lote`, { headers: this.headers, body: ids });
     }
 
     actualizar(%e%Id: number, %e%: %E%): Observable<%E%> {
