@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -116,7 +117,10 @@ func generateFormFile(interfaceName string) error {
 		if defaultVal == "{}" {
 			//fmt.Printf("modelContent %s\n", modelContent)
 			//fmt.Printf("propName %s\n", propName)
-			typeOfVariable := extractFieldType(modelContent, toKebabCase(propName))
+			typeOfVariable, wasFound := ExtractTypeForField(modelContent, propName)
+			if !wasFound {
+				return fmt.Errorf("failed parsying tpye %s for %s: found %s %w", propName, modelContent, typeOfVariable, errors.New("type couldn't be parsed"))
+			}
 			//fmt.Printf("typeOfVariable %s\n", typeOfVariable)
 			variableContent, err := openModelAsString(typeOfVariable)
 			//fmt.Printf("variableContent %s\n", variableContent)
@@ -170,7 +174,7 @@ func generateFormFile(interfaceName string) error {
 					</mat-select>
 				</mat-form-field>
 				`,
-				interfaceName,
+				toLowerCamelCase(interfaceName),
 				propName,
 				propName,
 				propName,
@@ -190,7 +194,7 @@ func generateFormFile(interfaceName string) error {
 							</mat-error>
 						</mat-form-field>
 					`,
-					interfaceName,
+					toLowerCamelCase(interfaceName),
 					propName,
 					propName,
 					propName,

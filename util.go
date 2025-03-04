@@ -108,15 +108,25 @@ func extractDescriptionFieldName(input string) string {
 	return ""
 }
 
-func extractFieldType(input, fieldName string) string {
-	pattern := fmt.Sprintf(`%s\s*:\s*([^;]+)\s*;`, fieldName)
+func ExtractTypeForField(input, fieldName string) (string, bool) {
+	// Normalize the input by removing extra whitespace
+	input = strings.TrimSpace(input)
+
+	// Create a pattern to match the field definition
+	// This handles various formats including optional fields and different spacing
+	pattern := fmt.Sprintf(`(?m)%s\??:\s*([^;,\n]+)`, regexp.QuoteMeta(fieldName))
 	re := regexp.MustCompile(pattern)
-	matches := re.FindStringSubmatch(input)
-	if len(matches) > 1 {
-		return strings.TrimSpace(matches[1])
+
+	// Find the first match
+	match := re.FindStringSubmatch(input)
+	if len(match) < 2 {
+		return "", false
 	}
-	return ""
+
+	// Return the extracted type, trimming any whitespace
+	return strings.TrimSpace(match[1]), true
 }
+
 func openModelAsString(interfaceName string) (string, error) {
 	modelPath := filepath.Join("src", "app", "core", "models", fmt.Sprintf("%s.model.ts", toKebabCase(interfaceName)))
 	modelPath = filepath.Join(".", modelPath)

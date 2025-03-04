@@ -24,12 +24,17 @@
 
 
         <!-- Table Section -->
+ 
         <div class="bg-white p-4 rounded-lg mb-4  dark:bg-neutral-800">
-            <app-shared-table (buscar)="buscar($event)" [translationGroup]="'mantenedores.%e%'" [displayedColumns]="displayedColumns" [dataSource]="dataSource" [pageNumber]="pageNumber"
-                [totalElements]="totalElements" [totalPages]="totalPages" [pageSize]="pageSize"
-                (deleteSelected)="onDeleteSelected($event)" (viewSelected)="onViewSelected($event)"
-                (pageChanged)="onPageChanged($event)" (sort)="sortDatos($event)" (editSelected)="onEditSelected($event)"
-                (selectionChange)="onSelectionChange($event)"></app-shared-table>
+            <app-shared-table (applyfilter)="buscar($event)" [filtersLabels]="activeOptionalFilters"
+                [translationGroup]="'mantenedores.%e%'" [displayedColumns]="displayedColumns"
+                [dataSource]="dataSource" [pageNumber]="pageNumber" [totalElements]="totalElements"
+                [totalPages]="totalPages" [pageSize]="pageSize"  (deleteSingleSelected)="onDeleteSingleSelected($event)"
+                (deleteSelected)="onDeleteSelected($event)" (viewSelected)="onViewSelected($event)" 
+                (pageChanged)="onPageChanged($event)" (sort)="sortDatos($event)"
+                (editSelected)="onEditSelected($event)" (selectionChange)="onSelectionChange($event)"
+                [simpleSearchField]="'%d%'" (filterDelete)="onFilterDeleted($event)"
+                [filters]='[]'></app-shared-table>
         </div>
     </div>
 </section>
