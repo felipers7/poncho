@@ -1,5 +1,5 @@
 # Poncho
-![Project Banner](https://tucupon.cl/producto/mlc1504130261-2/)
+![Un Poncho Cualquiera](un_poncho_cualquiera.jpg)
 
 
 ## Description
