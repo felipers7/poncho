@@ -9,6 +9,11 @@ Creador de componentes Angular
 ## Installation
 ```bash
 git clone https://github.com/your-username/your-repo.git
-cd your-repo
-npm install  # or other setup instructions
 ```
+
+After that you can add the folder to variable environments depending on your OS.
+
+```go
+go build
+```
+
