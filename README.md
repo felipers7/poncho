@@ -1,5 +1,5 @@
 # Poncho
-![Un Poncho Cualquiera](un_poncho-cualquiera.jpg)
+![Un Poncho Cualquiera](un_poncho_cualquiera.jpg)
 
 
 ## Description
