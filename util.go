@@ -99,8 +99,15 @@ func standardReplacementWithDescription(templateContent, interfaceName, descript
 }
 
 func extractDescriptionFieldName(input string) string {
+
 	reDesc := regexp.MustCompile(`;\s*(desc\w*)\s*:`)
 	matches := reDesc.FindStringSubmatch(input)
+	if len(matches) > 1 {
+		return strings.TrimSpace(matches[1])
+	}
+
+	reDesc = regexp.MustCompile(`(\b\w*Desc\w*)\s*:`)
+	matches = reDesc.FindStringSubmatch(input)
 	if len(matches) > 1 {
 		return strings.TrimSpace(matches[1])
 	}
@@ -110,6 +117,8 @@ func extractDescriptionFieldName(input string) string {
 	if len(matches) > 1 {
 		return strings.TrimSpace(matches[1])
 	}
+
+	fmt.Println("No description field found")
 
 	return ""
 }

@@ -105,7 +105,7 @@ export class %E%FormComponent implements OnInit {
         this.%e%Service.actualizar(formData.id, formData).subscribe({
           next: (response) => {
             this.toastr.success(this.translate.instant('mantenedores.formularios.toastr.success'));
-            this.dialogRef.close(response);
+            this.dialogRef.close(true);
           },
           error: (error) => {
             const errorMessage = error.error?.message || this.translate.instant('mantenedores.formularios.toastr.error');
@@ -118,7 +118,7 @@ export class %E%FormComponent implements OnInit {
         this.%e%Service.crear(formData).subscribe({
           next: (response) => {
             this.toastr.success(this.translate.instant('mantenedores.formularios.toastr.success'));
-            this.dialogRef.close(response);
+            this.dialogRef.close(true);
           },
           error: (error) => {
             const errorMessage = error.error?.message || this.translate.instant('mantenedores.formularios.toastr.error');

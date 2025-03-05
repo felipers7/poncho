@@ -151,14 +151,19 @@ func generateFormFile(interfaceName string) error {
 				`
 					this.%sService.buscarTodos().subscribe({
 						next:(%s :%s[])=>{
-							console.log("created entity ", %s)
 							this.%s = %s
+							const found%s = this.%s.find(e => e.id === this.data.object.%s.id);
+				  			this.form.patchValue({ %s: found%s })
 						}
 					})
 				`,
 				propName,
 				propName,
 				toPascalCase(propName),
+				propName,
+				propName,
+				propName,
+				propName,
 				propName,
 				propName,
 				propName,
@@ -189,7 +194,7 @@ func generateFormFile(interfaceName string) error {
 							<input matInput formControlName="%s"
 								[attr.placeholder]="'mantenedores.formularios.%s.descripcion' | translate"
 								class="w-full dark:text-white ">
-							<mat-error *ngIf="form.get('%s')?.hasError('required')" class="text-red-500">
+							<mat-error *ngIf="form.get('%s')?.hasError('required')" class="text-red-500 text-base">
 								{{ 'mantenedores.formularios.campoRequerido' | translate }}
 							</mat-error>
 						</mat-form-field>
