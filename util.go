@@ -92,6 +92,12 @@ func standardReplacement(templateContent, interfaceName string) string {
 	return templateContent
 }
 
+func standardReplacementWithDescription(templateContent, interfaceName, description string) string {
+	templateContent = standardReplacement(templateContent, interfaceName)
+	templateContent = strings.ReplaceAll(templateContent, "%d%", description)
+	return templateContent
+}
+
 func extractDescriptionFieldName(input string) string {
 	reDesc := regexp.MustCompile(`;\s*(desc\w*)\s*:`)
 	matches := reDesc.FindStringSubmatch(input)

@@ -61,17 +61,18 @@ func CreateTableHtml(entityName string) {
 		fmt.Printf("Error reading template: %v\n", err)
 		os.Exit(1)
 	}
+	modelContent, err := openModelAsString(entityName)
+	if err != nil {
+		fmt.Printf("Error reading model when creating html table: %v\n", err)
+		os.Exit(1)
+	}
+	descriptionFieldName := extractDescriptionFieldName(modelContent)
+	if descriptionFieldName == "" {
+		fmt.Printf("Error extracting description field name when creaing html table: %v\n", err)
+		os.Exit(1)
+	}
 
-	E := toUpperCamelCase(entityName)
-	e := toLowerCamelCase(entityName)
-	k := toKebabCase(entityName)
-	s := sentenceFromKebab(entityName)
-
-	newContent := string(templateContent)
-	newContent = strings.ReplaceAll(newContent, "%E%", E)
-	newContent = strings.ReplaceAll(newContent, "%e%", e)
-	newContent = strings.ReplaceAll(newContent, "%k%", k)
-	newContent = strings.ReplaceAll(newContent, "%s%", s)
+	newContent := standardReplacementWithDescription(string(templateContent), entityName, descriptionFieldName)
 
 	outputDir := "." + "/src/app/features/mantenedores/" + entityName
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
