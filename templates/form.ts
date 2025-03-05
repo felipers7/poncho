@@ -8,7 +8,7 @@ import { %E%Service } from '../../../core/services/%k%.service';
 import { MatError, MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-
+import { convertErrorMessageToI18 } from '../../../core/utils/errors.utils';
 /*services-imports*/
 
 
@@ -117,11 +117,11 @@ export class %E%FormComponent implements OnInit {
       else {
         this.%e%Service.crear(formData).subscribe({
           next: (response) => {
-            this.toastr.success(this.translate.instant('mantenedores.formularios.toastr.success'));
+            this.toastr.success(this.translate.instant('alertas.toastr.success'));
             this.dialogRef.close(true);
           },
-          error: (error) => {
-            const errorMessage = error.error?.message || this.translate.instant('mantenedores.formularios.toastr.error');
+          error: (error) => { 
+            const errorMessage = error.error?.message || this.translate.instant(convertErrorMessageToI18(error.message));
             this.toastr.error(errorMessage);
           }
         })

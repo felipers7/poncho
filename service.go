@@ -171,9 +171,9 @@ func generateFormFile(interfaceName string) error {
 			formInputs = append(formInputs, fmt.Sprintf(
 				`
 				<mat-form-field appearance="outline" class="full-width">
-					<mat-label>{{ 'mantenedores.formularios.%s.label.%s' | translate }}</mat-label>
+					<mat-label class="text-base">{{ 'mantenedores.formularios.%s.label.%s' | translate }}</mat-label>
 					<mat-select formControlName="%s">
-					<mat-option *ngFor="let option of %s" [value]="option">
+					<mat-option class="text-base" *ngFor="let option of %s" [value]="option">
 						{{ option.%s }}
 					</mat-option>
 					</mat-select>
@@ -190,10 +190,10 @@ func generateFormFile(interfaceName string) error {
 				formInputs = append(formInputs, fmt.Sprintf(
 					`
 					   <mat-form-field appearance="outline" class="w-full dark:text-white  ">
-							<mat-label>{{ 'mantenedores.formularios.%s.label.%s' | translate }}</mat-label>
+							<mat-label class="text-base" >{{ 'mantenedores.formularios.%s.label.%s' | translate }}</mat-label>
 							<input matInput formControlName="%s"
 								[attr.placeholder]="'mantenedores.formularios.%s.descripcion' | translate"
-								class="w-full dark:text-white ">
+								class="text-base w-full dark:text-white ">
 							<mat-error *ngIf="form.get('%s')?.hasError('required')" class="text-red-500 text-base">
 								{{ 'mantenedores.formularios.campoRequerido' | translate }}
 							</mat-error>
